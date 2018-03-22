@@ -3,6 +3,9 @@
 
 #include "clock.h"
 #include "register.h"
+#include "ram.h"
+
+void printBin(unsigned char value);
 
 class CPU2 {
 public:
@@ -14,6 +17,7 @@ private:
     Clock * clock;
     Register * regA;
     Register * regB;
+    RAM * ram;
 };
 
 #endif
