@@ -6,6 +6,7 @@ set(SRC
         src/clock.cpp
         src/register.cpp
         src/ram.cpp
+        src/counter.cpp
     )
 
 set(HEADERS 
@@ -13,6 +14,7 @@ set(HEADERS
         include/clock.h
         include/register.h
         include/ram.h
+        include/counter.h
     )
 
 set(TEST

@@ -4,6 +4,7 @@
 #include "clock.h"
 #include "register.h"
 #include "ram.h"
+#include "counter.h"
 
 void printBin(unsigned char value);
 
@@ -12,12 +13,17 @@ public:
     CPU2();
     ~CPU2();
     void run();
+    void load(unsigned char program[]);
 
 private:
     Clock * clock;
     Register * regA;
     Register * regB;
+    Register * memAddrReg;
+    Register * instrReg;
     RAM * ram;
+    Counter * progCntr;
+    Counter * microCntr;
 };
 
 #endif
