@@ -9,9 +9,11 @@ public:
     CPU2();
     ~CPU2();
     void run();
+
 private:
     Clock * clock;
     Register * regA;
+    Register * regB;
 };
 
 #endif

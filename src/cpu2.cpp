@@ -3,6 +3,7 @@
 CPU2::CPU2() {
     this->clock = new Clock();
     this->regA = new Register();
+    this->regB = new Register();
 }
 
 CPU2::~CPU2() {
