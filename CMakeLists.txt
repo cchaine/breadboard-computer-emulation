@@ -4,9 +4,11 @@ project(cpu2)
 set(SRC 
         src/main.cpp
         src/clock.cpp
+        src/register.cpp
     )
 set(HEADERS 
         include/cpu2/clock.h
+        include/cpu2/register.h
     )
 
 set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS} -std=c++14")
