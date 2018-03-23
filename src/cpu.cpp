@@ -2,7 +2,20 @@
 
 CPU::CPU() {
     this->clock = new Clock();
-    //this->clock = new Clock(220, 100, 0.000001);
+    this->init();
+}
+
+CPU::CPU(float frequency) {
+    this->clock = new Clock(frequency);
+    this->init();
+}
+
+CPU::CPU(float Ra, float Rb, float C) {
+    this->clock = new Clock(Ra, Rb, C);
+    this->init();
+}
+
+void CPU::init() {
     this->regA = new Register();
     this->regB = new Register();
     this->memAddrReg = new Register();
@@ -10,25 +23,6 @@ CPU::CPU() {
     this->ram = new RAM(16);
     this->progCntr = new Counter(0xff);
     this->microCntr = new Counter(0x7);
-}
-
-CPU::~CPU() {
-    delete(this->clock);
-    delete(this->regA);
-    delete(this->regB);
-    delete(this->memAddrReg);
-    delete(this->instrReg);
-    delete(this->ram);
-    delete(this->progCntr);
-    delete(this->microCntr);
-    this->clock = 0;
-    this->regA = 0;
-    this->regB = 0;
-    this->memAddrReg = 0;
-    this->instrReg = 0;
-    this->ram = 0;
-    this->progCntr = 0;
-    this->microCntr = 0;
 }
 
 enum microInstructions {
@@ -206,3 +200,23 @@ void printBin(unsigned char value) {
         }
     }
 }
+
+CPU::~CPU() {
+    delete(this->clock);
+    delete(this->regA);
+    delete(this->regB);
+    delete(this->memAddrReg);
+    delete(this->instrReg);
+    delete(this->ram);
+    delete(this->progCntr);
+    delete(this->microCntr);
+    this->clock = 0;
+    this->regA = 0;
+    this->regB = 0;
+    this->memAddrReg = 0;
+    this->instrReg = 0;
+    this->ram = 0;
+    this->progCntr = 0;
+    this->microCntr = 0;
+}
+

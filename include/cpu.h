@@ -11,6 +11,8 @@ void printBin(unsigned char value);
 class CPU {
 public:
     CPU();
+    CPU(float frequency);
+    CPU(float Ra, float Rb, float C);
     ~CPU();
     void run();
     void load(unsigned char program[]);
@@ -24,6 +26,7 @@ private:
     RAM * ram;
     Counter * progCntr;
     Counter * microCntr;
+    void init();
 };
 
 #endif
