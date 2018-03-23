@@ -15,6 +15,8 @@ set(HEADERS
         include/register.h
         include/ram.h
         include/counter.h
+        
+        lib/termcolor.hpp
     )
 
 set(TEST
@@ -24,5 +26,5 @@ set(TEST
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS} -std=c++14")
 add_executable(cpu ${SRC} ${HEADER} ${TEST})
-target_include_directories(cpu PRIVATE include)
+target_include_directories(cpu PRIVATE include lib)
 

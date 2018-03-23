@@ -79,6 +79,11 @@ void printInstructionSet() {
     }
 }
 
+void setCursorPos(int XPos, int YPos)
+{
+    printf("\033[%d;%dH", YPos+1, XPos+1);
+}
+
 void CPU::run() {
     loadInstructionSet();
     std::cout << "[__RAM__] " << std::endl;
@@ -155,32 +160,55 @@ void CPU::run() {
         }
 
         this->microCntr->enable();
+        
+        system("clear");
+        
+        setCursorPos(24, 0);
+        std::cout << "[BUS] ";
+        printBin(bus);
+      
+        setCursorPos(38, 1);
+        std::cout << "[PC] ";
+        printBin(this->progCntr->get());
+      
+        setCursorPos(38, 3);
+        std::cout << "[REGA] ";
+        printBin(this->regA->get());
+      
+        setCursorPos(0, 1);
+        std::cout << "[RAM] ";
+        printBin(this->ram->get(this->memAddrReg->get()));
+      
+        setCursorPos(38, 5);
+        if((controlWord & SUB) == SUB) {
+            std::cout << "[SUB] ";
+            printBin(this->regA->get() - this->regB->get());
+        }else {
+            std::cout << "[SUM] ";
+            printBin(this->regA->get() + this->regB->get());
+        }
+      
+        setCursorPos(0, 3);
+        std::cout << "[MEMADDR] ";
+        printBin(this->memAddrReg->get());
+      
+        setCursorPos(38, 7);
+        std::cout << "[REGB] ";
+        printBin(this->regB->get());
+      
+        setCursorPos(0, 5);
+        std::cout << "[INSTR] ";
+        printBin(this->instrReg->get());
 
+        setCursorPos(0, 7);
         std::cout << "[CTRLW] ";
         printBin(controlWord >> 8);
         printBin(controlWord);
+      
+        setCursorPos(38, 9);
+        std::cout << "[MICRCNTR] ";
+        printBin(this->microCntr->get());
         std::cout << std::endl;
-        std::cout << "[BUS] ";
-        printBin(bus);
-        std::cout << std::endl;
-        std::cout << "[PC] ";
-        printBin(this->progCntr->get());
-        std::cout << std::endl;
-        std::cout << "[INSTR] ";
-        printBin(this->instrReg->get());
-        std::cout << std::endl;
-        std::cout << "[MEMADDR] ";
-        printBin(this->memAddrReg->get());
-        std::cout << std::endl;
-        std::cout << "[RAM] ";
-        printBin(this->ram->get(this->memAddrReg->get()));
-        std::cout << std::endl;
-        std::cout << "[REGA] ";
-        printBin(this->regA->get());
-        std::cout << std::endl;
-        std::cout << "[REGB] ";
-        printBin(this->regB->get());
-        std::cout << std::endl; 
     }
 }
 
@@ -191,12 +219,13 @@ void CPU::load(unsigned char program[]) {
 }
 
 
+
 void printBin(unsigned char value) {
     for(int i = 0; i < 8; i++) {
         if((value & (1 << (7 - i))) != 0) {
-            std::cout << "1";
+            std::cout << termcolor::green << "1" << termcolor::reset;
         } else {
-            std::cout << "0";
+            std::cout << termcolor::grey << "0" << termcolor::reset;
         }
     }
 }

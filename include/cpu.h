@@ -5,6 +5,7 @@
 #include "register.h"
 #include "ram.h"
 #include "counter.h"
+#include "termcolor.hpp"
 
 void printBin(unsigned char value);
 

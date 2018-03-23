@@ -10,7 +10,12 @@ int main(int args, char *argv[]) {
         }
     }
 
-    CPU * cpu = new CPU();
+    CPU * cpu;
+    if(!DEBUG) {
+        cpu = new CPU(220, 110, 0.000001);
+    }else {
+        cpu = new CPU();
+    }
 
     unsigned char program[] = {0x13, 0x34, 0x0, 0xA, 0xB};
 
