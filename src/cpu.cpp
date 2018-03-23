@@ -1,6 +1,6 @@
-#include "cpu2.h"
+#include "cpu.h"
 
-CPU2::CPU2() {
+CPU::CPU() {
     this->clock = new Clock();
     //this->clock = new Clock(220, 100, 0.000001);
     this->regA = new Register();
@@ -12,7 +12,7 @@ CPU2::CPU2() {
     this->microCntr = new Counter(0x7);
 }
 
-CPU2::~CPU2() {
+CPU::~CPU() {
     delete(this->clock);
     delete(this->regA);
     delete(this->regB);
@@ -85,7 +85,7 @@ void printInstructionSet() {
     }
 }
 
-void CPU2::run() {
+void CPU::run() {
     loadInstructionSet();
     std::cout << "[__RAM__] " << std::endl;
     for(int i = 0; i < this->ram->getSize(); i++) {
@@ -190,7 +190,7 @@ void CPU2::run() {
     }
 }
 
-void CPU2::load(unsigned char program[]) {
+void CPU::load(unsigned char program[]) {
     for(int i = 0; i < sizeof(&program); i++) {
         this->ram->set(i, program[i]);
     }

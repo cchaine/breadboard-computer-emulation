@@ -1,5 +1,5 @@
 #include <iostream>
-#include "cpu2.h"
+#include "cpu.h"
 
 bool DEBUG = false;
 
@@ -10,7 +10,7 @@ int main(int args, char *argv[]) {
         }
     }
 
-    CPU2 * cpu = new CPU2();
+    CPU * cpu = new CPU();
 
     unsigned char program[] = {0x13, 0x34, 0x0, 0xA, 0xB};
 

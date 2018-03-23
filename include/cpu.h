@@ -1,5 +1,5 @@
-#ifndef CPU2_H
-#define CPU2_H
+#ifndef CPU_H
+#define CPU_H
 
 #include "clock.h"
 #include "register.h"
@@ -8,10 +8,10 @@
 
 void printBin(unsigned char value);
 
-class CPU2 {
+class CPU {
 public:
-    CPU2();
-    ~CPU2();
+    CPU();
+    ~CPU();
     void run();
     void load(unsigned char program[]);
 

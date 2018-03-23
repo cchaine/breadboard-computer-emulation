@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
-project(cpu2)
+project(cpu)
 
 set(SRC 
-        src/cpu2.cpp
+        src/cpu.cpp
         src/clock.cpp
         src/register.cpp
         src/ram.cpp
@@ -10,7 +10,7 @@ set(SRC
     )
 
 set(HEADERS 
-        include/cpu2.h
+        include/cpu.h
         include/clock.h
         include/register.h
         include/ram.h
@@ -23,6 +23,6 @@ set(TEST
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS} -std=c++14")
-add_executable(cpu2 ${SRC} ${HEADER} ${TEST})
-target_include_directories(cpu2 PRIVATE include)
+add_executable(cpu ${SRC} ${HEADER} ${TEST})
+target_include_directories(cpu PRIVATE include)
 
