@@ -12,7 +12,7 @@ int main(int args, char *argv[]) {
 
     CPU2 * cpu = new CPU2();
 
-   unsigned char program[] = {0x1, 0x2, 0x3, 0x4, 0x5};
+    unsigned char program[] = {0x12, 0x0, 0x1};
 
     cpu->load(program);
     cpu->run();

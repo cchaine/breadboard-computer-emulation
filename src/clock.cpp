@@ -32,7 +32,7 @@ void Clock::setFrequency(float frequency) {
 
 void Clock::waitForPulse() {
     if(this->stepping) {
-        std::cout << "[stepping]";
+        std::cout << "[__stepping__]";
         std::cin.get();
     } else {
         float deltaTime;
