@@ -2,13 +2,14 @@
 
 CPU2::CPU2() {
     this->clock = new Clock();
+    //this->clock = new Clock(220, 100, 0.000001);
     this->regA = new Register();
     this->regB = new Register();
     this->memAddrReg = new Register();
     this->instrReg = new Register();
     this->ram = new RAM(16);
-    this->progCntr = new Counter();
-    this->microCntr = new Counter();
+    this->progCntr = new Counter(0xff);
+    this->microCntr = new Counter(0x7);
 }
 
 CPU2::~CPU2() {
@@ -95,11 +96,8 @@ void CPU2::run() {
     while(!this->clock->isHalted()){
         this->clock->waitForPulse();
         
-        std::cout << "____";
-        printBin(((this->instrReg->get() >> 4) << 3) | (this->microCntr->get() & 0x7));
-        std::cout << std::endl;
         int controlWord = 
-            instructionSet[((this->instrReg->get() >> 4) << 3) | (this->microCntr->get() & 0x7)];
+            instructionSet[((this->instrReg->get() >> 4) << 3) | this->microCntr->get()];
         unsigned char bus;
 
         if((controlWord & HLT) == HLT) {

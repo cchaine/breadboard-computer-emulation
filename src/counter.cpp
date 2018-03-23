@@ -1,7 +1,7 @@
 #include "counter.h"
 
-Counter::Counter() {
-
+Counter::Counter(unsigned char max) {
+    this->max = max;
 }
 
 Counter::~Counter() {
@@ -18,4 +18,7 @@ void Counter::set(unsigned char value) {
 
 void Counter::enable() {
     this->value++;
+    if(this->value > max){
+        this->value = 0;
+    }
 }
