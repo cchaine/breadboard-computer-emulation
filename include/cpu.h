@@ -8,6 +8,8 @@
 #include "termcolor.hpp"
 
 void printBin(unsigned char value);
+void setCursorPos(int XPos, int YPos);
+void printInstructionSet();
 
 class CPU {
 public:
@@ -28,6 +30,7 @@ private:
     Counter * progCntr;
     Counter * microCntr;
     void init();
+    void printContent(unsigned char bus, int controlWord);
 };
 
 #endif

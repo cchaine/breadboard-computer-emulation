@@ -2,17 +2,27 @@
 #include "cpu.h"
 
 bool DEBUG = false;
+int frequency = -1;
 
 int main(int args, char *argv[]) {
     for(int i = 1; i < args; i++) {
         if(!strcmp(argv[i], "-d")) {
             DEBUG = true;
         }
+
+        if(!strcmp(argv[i], "-f")) {
+            frequency = std::stoi(argv[i+1]);
+            std::cout << frequency << std::endl;
+        }
     }
 
     CPU * cpu;
     if(!DEBUG) {
-        cpu = new CPU(220, 110, 0.000001);
+        if(frequency == -1) {
+            cpu = new CPU(220, 110, 0.000001);
+        } else {
+            cpu = new CPU(frequency);
+        }
     }else {
         cpu = new CPU();
     }
