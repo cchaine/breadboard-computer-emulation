@@ -10,9 +10,29 @@ CPU::CPU(float frequency) {
     this->init();
 }
 
+// Constructor specific to the clock implementation on the electronic model
 CPU::CPU(float Ra, float Rb, float C) {
     this->clock = new Clock(Ra, Rb, C);
     this->init();
+}
+
+CPU::~CPU() {
+    delete(this->clock);
+    this->clock = 0;
+    delete(this->regA);
+    this->regA = 0;
+    delete(this->regB);
+    this->regB = 0;
+    delete(this->memAddrReg);
+    this->memAddrReg = 0;
+    delete(this->instrReg);
+    this->instrReg = 0;
+    delete(this->ram);
+    this->ram = 0;
+    delete(this->progCntr);
+    this->progCntr = 0;
+    delete(this->microCntr);
+    this->microCntr = 0;
 }
 
 void CPU::init() {
@@ -23,67 +43,53 @@ void CPU::init() {
     this->ram = new RAM(16);
     this->progCntr = new Counter(0xff);
     this->microCntr = new Counter(0x5);
+    
+    this->init_control_logic();
 }
 
-enum microInstructions {
-    HLT = 1, 
-    RI = 1 << 1, 
-    RO = 1 << 2,
-    MI = 1 << 3, 
-    II = 1 << 4, 
-    IO = 1 << 5, 
-    BO = 1 << 6, 
-    BI = 1 << 7,
-    SUB = 1 << 8,
-    SO = 1 << 9,
-    AO = 1 << 10,
-    AI = 1 << 11,
-    CI = 1 << 12,
-    CO = 1 << 13,
-    CE = 1 << 14
-};
-std::string controls[] = { "CE", "CO", "CI", "AI", "AO", "SO", "SUB", "BI", "BO", "IO", "II", "MI", "RO", "RI", "HLT" }; 
-  
+/*
+    Specifies the microinstructions associated with each instructions
 
-int instructionSet[0x7f];
-
-void loadInstructionSet() {
-    //fetch
+    'controlLogic' is the equivalent of an EEPROM where the index of the array is the address passed to the chip.
+    
+    Inside is stored the control word for the X instruction at the Y step.
+    The address of the control word is an 8-bit word where the four most significant bits are the X instruction
+    and the three least significant bits are the Y step.
+    
+    For instance, 'this->controlLogic[0x1 << 3 | 2]' is the control word for the 2nd step of the instruction 0x1.
+*/
+void CPU::init_control_logic() {
+    // Each instruction starts with a fetch
     for(int i = 0; i < 16; i++) {
-        instructionSet[i << 3] = CO | MI;
-        instructionSet[(i << 3) | 1] = RO | II | CE;
+        this->controlLogic[i << 3] = CO | MI;
+        this->controlLogic[(i << 3) | 1] = RO | II | CE;
     }
 
     //hlt
-    instructionSet[(0 << 3) | 2] = HLT;
+    this->controlLogic[(0x0 << 3) | 2] = HLT;
 
     //lda
-    instructionSet[(1 << 3) | 2] = IO | MI;
-    instructionSet[(1 << 3) | 3] = RO | AI;
+    this->controlLogic[(0x1 << 3) | 2] = IO | MI;
+    this->controlLogic[(0x1 << 3) | 3] = RO | AI;
 
     //sta
-    instructionSet[(2 << 3) | 2] = IO | MI;
-    instructionSet[(2 << 3) | 3] = AO | RI;
+    this->controlLogic[(0x2 << 3) | 2] = IO | MI;
+    this->controlLogic[(0x2 << 3) | 3] = AO | RI;
    
     //add
-    instructionSet[(3 << 3) | 2] = IO | MI;
-    instructionSet[(3 << 3) | 3] = RO | BI;
-    instructionSet[(3 << 3) | 4] = SO | AI;
-
+    this->controlLogic[(0x3 << 3) | 2] = IO | MI;
+    this->controlLogic[(0x3 << 3) | 3] = RO | BI;
+    this->controlLogic[(0x3 << 3) | 4] = SO | AI;
 }
 
 void CPU::run() {
-    loadInstructionSet();
-    std::cout << "[__RAM__] " << std::endl;
-    for(int i = 0; i < this->ram->getSize(); i++) {
-        printBin(this->ram->get(i));
-        std::cout << std::endl;
-    }
-
-    int controlWord = 
-            instructionSet[((this->instrReg->get() >> 4) << 3) | this->microCntr->get()];
     unsigned char bus = 0;
-    printContent(bus, controlWord);
+
+    // Gets the control word from the controlLogic array initialized above
+    // The index is the address in the EEPROM, where the four most significant bits are the instruction and the three least significant bits are the microinstruction step
+    int controlWord = 
+            controlLogic[((this->instrReg->get() >> 4) << 3) | this->microCntr->get()];
+    print_content(bus, controlWord);
 
     while(!this->clock->isHalted()){
         this->clock->waitForPulse();
@@ -93,6 +99,7 @@ void CPU::run() {
         } if((controlWord & RO) == RO) {
             bus = this->ram->get(this->memAddrReg->get());
         } if((controlWord & IO) == IO) {
+            // Puts the content of the four least significant bits of the instruction register (the parameter of the instruction) onto the bus
             bus = (this->instrReg->get() & 0xf);
         } if((controlWord & BO) == BO) {
             bus = this->regB->get();
@@ -121,131 +128,47 @@ void CPU::run() {
         }
 
         this->microCntr->enable();
+        // Gets the next control word before updating the view for better understanding
         controlWord = 
-            instructionSet[((this->instrReg->get() >> 4) << 3) | this->microCntr->get()];
-      
-        printContent(bus, controlWord);
+            controlLogic[((this->instrReg->get() >> 4) << 3) | this->microCntr->get()];
+        print_content(bus, controlWord);
     }
 }
 
-void CPU::printContent(unsigned char bus, int controlWord) {
+/*
+    Prints the state of the CPU
+*/
+void CPU::print_content(unsigned char bus, int controlWord) {
   system("clear");
+
+  print_ram(this->ram);
   
-  setCursorPos(17, 0);
-  std::cout << "[BUS] ";
-  setCursorPos(17, 1);
-  printBin(bus);
+  print_bus(bus);
+  print_pc(this->progCntr->get());
+  print_rega(this->regA->get());
+  print_ram(this->ram->get(this->memAddrReg->get()));
   
-  setCursorPos(26, 1);
-  std::cout << "[PC] ";
-  setCursorPos(26, 2);
-  printBin(this->progCntr->get());
-  
-  setCursorPos(26, 4);
-  std::cout << "[REGA] ";
-  setCursorPos(26, 5);
-  printBin(this->regA->get());
-  
-  setCursorPos(11, 1);
-  std::cout << "[RAM] ";
-  setCursorPos(8, 2);
-  printBin(this->ram->get(this->memAddrReg->get()));
-  
-  setCursorPos(26, 7);
   if((controlWord & SUB) == SUB) {
-    std::cout << "[SUB] ";
-    setCursorPos(26, 8);
-    printBin(this->regA->get() - this->regB->get());
+    print_sub(this->regA->get() - this->regB->get());
   }else {
-    std::cout << "[SUM] ";
-    setCursorPos(26, 8);
-    printBin(this->regA->get() + this->regB->get());
+    print_sum(this->regA->get() + this->regB->get());
   }
   
-  setCursorPos(7, 4);
-  std::cout << "[MEMADDR] ";
-  setCursorPos(8, 5);
-  printBin(this->memAddrReg->get());
+  print_memaddr(this->memAddrReg->get());
+  print_regb(this->regB->get());
+  print_instr(this->instrReg->get());
+  print_ctrlw(controlWord);
   
-  setCursorPos(26, 10);
-  std::cout << "[REGB] ";
-  setCursorPos(26, 11);
-  printBin(this->regB->get());
-  
-  setCursorPos(9, 7);
-  std::cout << "[INSTR] ";
-  setCursorPos(8, 8);
-  printBin(this->instrReg->get());
-  
-  setCursorPos(9, 10);
-  std::cout << "[CTRLW] ";
-  setCursorPos(0, 11);
-  printBin(controlWord >> 8);
-  printBin(controlWord);
-  
-  setCursorPos(6, 12);
-  std::cout << "[MICRCNTR] ";
-  setCursorPos(8, 13);
-  printBin(this->microCntr->get());
-  std::cout << std::endl;
-
-  for(int i = 0; i < sizeof(controls)/24; i++) {
-    if((controlWord & (1 << (sizeof(controls)/24 - i - 1)))  == (1 << (sizeof(controls)/24 - 1 - i))) {
-        std::cout << termcolor::green;            
-    } else {
-        std::cout << termcolor::grey;
-    }
-    std::cout << controls[i] << " ";
-  }
-  std::cout << termcolor::reset << std::endl;
+  print_micrcntr(this->microCntr->get());
+  print_micro_instructions(controlWord);
 }
 
-void setCursorPos(int XPos, int YPos)
-{
-  printf("\033[%d;%dH", YPos+1, XPos+1);
-}
-
-void printInstructionSet() {
-  for(int i = 0; i < 0x7f; i++) {
-    std::cout << i << " ";
-    printBin(instructionSet[i] >> 8);
-    printBin(instructionSet[i]);
-    std::cout << std::endl;
-  }
-}
-
-void printBin(unsigned char value) {
-  for(int i = 0; i < 8; i++) {
-    if((value & (1 << (7 - i))) != 0) {
-      std::cout << termcolor::green << "1" << termcolor::reset;
-    } else {
-      std::cout << termcolor::grey << "0" << termcolor::reset;
-    }
-  }
-}
-
-void CPU::load(unsigned char program[]) {
-    for(int i = 0; i < sizeof(&program); i++) {
+/*
+    Loads a program in memory
+*/
+void CPU::load(unsigned char program[], int size) {
+    this->ram->clear();
+    for(int i = 0; i < size; i++) {
         this->ram->set(i, program[i]);
     }
 }
-
-CPU::~CPU() {
-    delete(this->clock);
-    delete(this->regA);
-    delete(this->regB);
-    delete(this->memAddrReg);
-    delete(this->instrReg);
-    delete(this->ram);
-    delete(this->progCntr);
-    delete(this->microCntr);
-    this->clock = 0;
-    this->regA = 0;
-    this->regB = 0;
-    this->memAddrReg = 0;
-    this->instrReg = 0;
-    this->ram = 0;
-    this->progCntr = 0;
-    this->microCntr = 0;
-}
-

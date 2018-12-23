@@ -27,9 +27,9 @@ int main(int args, char *argv[]) {
         cpu = new CPU();
     }
 
-    unsigned char program[] = {0x13, 0x34, 0x0, 0xA, 0xB};
+    unsigned char program[] = {0x14, 0x35, 0x26, 0x0, 0xA, 0xB};
 
-    cpu->load(program);
+    cpu->load(program, sizeof(program));
     cpu->run();
     delete(cpu);
     cpu = 0;

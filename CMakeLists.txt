@@ -7,6 +7,7 @@ set(SRC
         src/register.cpp
         src/ram.cpp
         src/counter.cpp
+        src/tools.cpp
     )
 
 set(HEADERS 
@@ -15,6 +16,7 @@ set(HEADERS
         include/register.h
         include/ram.h
         include/counter.h
+        include/tools.h
         
         lib/termcolor.hpp
     )

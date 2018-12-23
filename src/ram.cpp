@@ -20,3 +20,9 @@ void RAM::set(unsigned char address, unsigned char value) {
 int RAM::getSize() {
     return this->size;
 }
+
+void RAM::clear() {
+    for(int i = 0; i < this->getSize(); i++) {
+        this->data[i] = 0;
+    }
+}

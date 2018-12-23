@@ -10,6 +10,7 @@ public:
     unsigned char get(unsigned char address);
     void set(unsigned char address, unsigned char value);
     int getSize();
+    void clear();
 private:
     int size;
     unsigned char *data;
